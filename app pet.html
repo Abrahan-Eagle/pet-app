@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha Pet - App Multimascota con IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Optimización de CSS --- */
+        /* Se han consolidado y reorganizado las reglas para mayor claridad y eficiencia. */
+
+        .pet-image-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #fbbf24;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .pet-image { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Efecto hover para subir foto de perfil */
+        .pet-image-container:hover::after {
+            content: '\f030'; /* Icono de cámara de Font Awesome */
+            font-family: 'Font Awesome 6 Free', 'FontAwesome', sans-serif; /* Fallback para versiones anteriores */
+            font-weight: 900;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .pet-image-container:hover::after {
+            opacity: 1;
+        }
+
+        .file-upload-card {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-upload-card:hover { border-color: #3b82f6; background-color: #eff6ff; }
+        
+        .medical-history-item { border-left: 4px solid #3b82f6; padding-left: 1rem; margin-bottom: 1rem; }
+        
+        .view-section-title { border-bottom: 2px solid #6366f1; padding-bottom: 0.5rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold; color: #3730a3; }
+        .view-info-grid { display: grid; grid-template-columns: 150px 1fr; gap: 0.5rem 1rem; align-items: center;}
+        .view-info-grid dt { font-weight: bold; color: #4b5563; text-align: right; }
+        .view-info-grid dd { color: #1f2937; }
+        .view-history-entry { border-left: 3px solid #6366f1; padding-left: 1rem; margin-top: 1rem; page-break-inside: avoid; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 50; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background-color: white; border-radius: 0.5rem; padding: 2rem;
+            width: 90%; max-width: 600px; max-height: 90vh;
+            overflow-y: auto; transform: scale(0.95); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .loader {
+            width: 48px; height: 48px; border: 5px solid #FFF;
+            border-bottom-color: #3b82f6; border-radius: 50%;
+            display: inline-block; box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .gemini-btn { background: linear-gradient(45deg, #4f46e5, #818cf8); border: none; }
+        .onboarding-step { display: none; }
+        .onboarding-step.active { display: block; }
+
+        /* Notification Toast */
+        #notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #notification-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast-info { background-color: #3b82f6; } /* blue-500 */
+        .toast-error { background-color: #ef4444; } /* red-500 */
+        .toast-success { background-color: #22c55e; } /* green-500 */
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">
+                <i class="fas fa-paw mr-2"></i>Ficha Pet
+            </h1>
+            <p class="text-gray-600">El registro digital de todos tus compañeros</p>
+        </header>
+
+        <!-- Dashboard Screen -->
+        <main id="dashboard-screen" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Mis Mascotas</h2>
+                <button id="add-pet-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center shadow-md" aria-label="Agregar una nueva mascota"><i class="fas fa-plus mr-2"></i>Agregar Mascota</button>
+            </div>
+            <div id="pet-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Pet cards will be inserted here -->
+            </div>
+            <div id="no-pets-message" class="hidden text-center py-16 bg-white rounded-lg shadow-md">
+                <i class="fas fa-cat text-6xl text-gray-300"></i>
+                <h3 class="text-2xl font-bold text-gray-700 mt-4">No tienes mascotas registradas</h3>
+                <p class="text-gray-500 mt-2">¡Agrega tu primera mascota para empezar!</p>
+            </div>
+        </main>
+
+        <!-- Edit Screen -->
+        <main id="edit-screen" class="hidden bg-white rounded-xl shadow-lg overflow-hidden p-6 sm:p-8 mb-8 relative">
+            <button id="back-to-dashboard-from-edit" class="absolute top-4 right-4 bg-gray-200 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-300" aria-label="Volver a la lista de mascotas">&larr; Volver</button>
+            <div class="text-center mb-10">
+                <label for="imageUpload" class="pet-image-container block cursor-pointer" title="Haz clic para cambiar la foto">
+                    <img id="petImage" class="pet-image" src="https://placehold.co/150x150/FBBF24/FFFFFF?text=Mascota" alt="Foto de la mascota">
+                    <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                </label>
+                <div class="mt-4">
+                    <input type="text" id="petName" class="text-2xl font-bold text-center bg-transparent border-b-2 border-gray-200 focus:border-indigo-500 outline-none w-full max-w-xs" placeholder="Nombre de tu mascota">
+                </div>
+            </div>
+
+            <section class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Información Básica</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Tipo</label>
+                        <div class="flex space-x-4"><button id="dogBtn" class="pet-type-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center w-full justify-center transition"><i class="fas fa-dog mr-2"></i> Perro</button><button id="catBtn" class="pet-type-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center w-full justify-center transition"><i class="fas fa-cat mr-2"></i> Gato</button></div>
+                    </div>
+                    <div>
+                        <label for="birthday" class="block text-gray-700 font-medium mb-2">Nacimiento</label>
+                        <input type="date" id="birthday" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="weight" class="block text-gray-700 font-medium mb-2">Peso (kg)</label>
+                        <input type="number" id="weight" step="0.1" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Ej. 5.2">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Sexo</label>
+                        <div class="flex space-x-4"><button id="maleBtn" class="gender-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center w-full justify-center transition"><i class="fas fa-mars mr-2"></i> Macho</button><button id="femaleBtn" class="gender-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center w-full justify-center transition"><i class="fas fa-venus mr-2"></i> Hembra</button></div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="breed" class="block text-gray-700 font-medium mb-2">Raza</label>
+                        <input type="text" id="breed" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Ej. Labrador, Siamés, etc.">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-medium mb-2">¿Tiene Microchip?</label>
+                        <div class="flex space-x-4">
+                            <button id="microchipYesBtn" class="microchip-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center w-full justify-center transition"><i class="fas fa-check mr-2"></i> Sí</button>
+                            <button id="microchipNoBtn" class="microchip-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center w-full justify-center transition"><i class="fas fa-times mr-2"></i> No</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <section class="mb-8">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-syringe mr-3 text-green-600"></i>Vacunación</h2>
+                        <div class="space-y-4">
+                            <div><label for="lastVaccineDate" class="block text-gray-700 font-medium mb-2">Fecha de última vacuna</label><input type="date" id="lastVaccineDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></div>
+                            <div><label for="nextVaccineDate" class="block text-gray-700 font-medium mb-2">Próxima vacuna (en 1 año)</label><input type="date" id="nextVaccineDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly></div>
+                            <div><label for="vaccineType" class="block text-gray-700 font-medium mb-2">Tipo de vacuna</label><input type="text" id="vaccineType" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Ej. Rabia, Triple felina"></div>
+                            <label for="vaccineCardUpload" class="file-upload-card"><div id="vaccineCardContent" class="text-center p-4"><i class="fas fa-file-image text-4xl text-gray-400 mb-2"></i><p class="text-gray-500">Subir carnet</p></div><input type="file" id="vaccineCardUpload" accept="image/*" class="hidden"></label>
+                        </div>
+                    </section>
+                    <section class="mb-8">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-bug mr-3 text-orange-600"></i>Desparasitación</h2>
+                        <div class="space-y-4">
+                            <div><label for="lastDewormingDate" class="block text-gray-700 font-medium mb-2">Última desparasitación</label><input type="date" id="lastDewormingDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></div>
+                            <div><label for="nextDewormingDate" class="block text-gray-700 font-medium mb-2">Próxima (en 6 meses)</label><input type="date" id="nextDewormingDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly></div>
+                            <div><label for="dewormingProduct" class="block text-gray-700 font-medium mb-2">Producto utilizado</label><input type="text" id="dewormingProduct" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nombre del desparasitante"></div>
+                        </div>
+                    </section>
+                </div>
+                <div>
+                    <section class="mb-8">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center mb-4"><i class="fas fa-notes-medical mr-3 text-red-600"></i>Historial Médico</h2>
+                        <div class="mb-4">
+                            <textarea id="medicalHistoryInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="3" placeholder="Añadir nueva entrada..."></textarea>
+                            <button id="addHistoryBtn" class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-plus mr-2"></i>Añadir</button>
+                            <p class="text-xs text-gray-500 italic mt-1 text-center">Recuerda pulsar "Añadir" para guardar cada entrada en el historial.</p>
+                        </div>
+                        <div id="historyEntries" class="space-y-4 max-h-60 overflow-y-auto pr-2"></div>
+                    </section>
+                    <section class="mb-8">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-file-medical mr-3 text-blue-600"></i>Exámenes</h2>
+                        <label for="examsCardUpload" class="file-upload-card"><div id="examsCardContent" class="text-center p-4"><i class="fas fa-file-upload text-4xl text-gray-400 mb-2"></i><p class="text-gray-500">Subir resultados</p></div><input type="file" id="examsCardUpload" accept="image/*,.pdf" class="hidden" multiple></label>
+                        <div id="examsCardPreview" class="mt-2 space-y-2"></div>
+                    </section>
+                </div>
+            </div>
+            <section class="text-center border-t pt-8 mt-4">
+                <button id="saveBtn" class="w-full max-w-sm bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center text-lg shadow-md" aria-label="Guardar los cambios y ver la ficha de la mascota"><i class="fas fa-save mr-3"></i>Guardar y Ver Ficha</button>
+            </section>
+        </main>
+
+        <!-- View Screen -->
+        <div id="view-screen" class="hidden bg-white rounded-xl shadow-lg p-6 sm:p-8 relative">
+            <button id="back-to-dashboard-from-view" class="absolute top-4 right-4 bg-gray-200 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-300" aria-label="Volver a la lista de mascotas">&larr; Volver a la lista</button>
+            <header class="flex flex-col sm:flex-row items-center justify-between mb-8">
+                <div class="text-center sm:text-left">
+                    <h1 id="view-petName" class="text-4xl font-bold text-indigo-800"></h1>
+                    <p id="view-breed" class="text-xl text-gray-600"></p>
+                </div>
+                <img id="view-petImage" src="" class="mt-4 sm:mt-0 w-40 h-40 rounded-full object-cover border-4 border-indigo-300">
+            </header>
+            <main>
+                <section class="mb-8">
+                    <h2 class="view-section-title">Información Básica</h2>
+                    <dl class="view-info-grid">
+                        <dt>Tipo:</dt><dd id="view-type"></dd>
+                        <dt>Sexo:</dt><dd id="view-gender"></dd>
+                        <dt>Nacimiento:</dt><dd id="view-birthday"></dd>
+                        <dt>Peso:</dt><dd id="view-weight"></dd>
+                        <dt>Microchip:</dt><dd id="view-microchip"></dd>
+                    </dl>
+                </section>
+                <section class="mb-8">
+                    <h2 class="view-section-title">Salud y Prevención</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-indigo-700">Vacunación</h3>
+                            <dl class="view-info-grid">
+                                <dt>Última:</dt><dd id="view-lastVaccineDate"></dd>
+                                <dt>Próxima:</dt><dd id="view-nextVaccineDate"></dd>
+                                <dt>Tipo:</dt><dd id="view-vaccineType"></dd>
+                            </dl>
+                            <div id="view-vaccineCard" class="mt-4"></div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-indigo-700">Desparasitación</h3>
+                            <dl class="view-info-grid">
+                                <dt>Última:</dt><dd id="view-lastDewormingDate"></dd>
+                                <dt>Próxima:</dt><dd id="view-nextDewormingDate"></dd>
+                                <dt>Producto:</dt><dd id="view-dewormingProduct"></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </section>
+                <section id="view-medicalHistorySection" class="mb-8 hidden">
+                    <h2 class="view-section-title">Historial Médico</h2>
+                    <div id="view-historyEntries" class="space-y-4"></div>
+                </section>
+                <section id="view-examsSection" class="hidden">
+                    <h2 class="view-section-title">Exámenes Médicos</h2>
+                    <div id="view-examsPreview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+                </section>
+            </main>
+            <footer class="text-center border-t pt-8 mt-8 space-y-4">
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button id="analyzeHistoryBtnView" class="w-full sm:w-auto gemini-btn text-white px-4 py-2 rounded-lg hover:opacity-90 transition flex items-center justify-center text-md shadow-md"><i class="fas fa-magic-sparkles mr-2"></i>Analizar Historial</button>
+                    <button id="generateCareGuideBtn" class="w-full sm:w-auto gemini-btn text-white px-4 py-2 rounded-lg hover:opacity-90 transition flex items-center justify-center text-md shadow-md"><i class="fas fa-book-medical mr-2"></i>Guía de Cuidado</button>
+                    <button id="symptomCheckerBtn" class="w-full sm:w-auto gemini-btn text-white px-4 py-2 rounded-lg hover:opacity-90 transition flex items-center justify-center text-md shadow-md"><i class="fas fa-stethoscope mr-2"></i>Analizar Síntomas</button>
+                    <button id="foodCheckerBtn" class="w-full sm:w-auto gemini-btn text-white px-4 py-2 rounded-lg hover:opacity-90 transition flex items-center justify-center text-md shadow-md"><i class="fas fa-bone mr-2"></i>¿Puede comer esto?</button>
+                    <button id="editBtn" class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-md shadow-md" aria-label="Editar la ficha de la mascota actual"><i class="fas fa-pencil-alt mr-2"></i>Editar Ficha</button>
+                </div>
+            </footer>
+        </div>
+        <footer class="text-center text-gray-500 text-sm mt-8">
+            <p>© 2025 Ficha Pet App</p>
+        </footer>
+    </div>
+    
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modal-title" class="text-2xl font-bold text-indigo-700">Análisis con IA</h2>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+            <div id="modal-body">
+                <div id="modal-input-area" class="hidden mb-4">
+                    <label id="modal-input-label" for="modal-text-input" class="block text-gray-700 font-medium mb-2"></label>
+                    <textarea id="modal-textarea-input" class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg" rows="4"></textarea>
+                    <input type="text" id="modal-text-input" class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <button id="modal-submit-btn" class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Enviar</button>
+                </div>
+                <div id="modal-loader" class="text-center p-8">
+                    <div class="loader mx-auto"></div>
+                    <p class="mt-4 text-gray-600">Analizando... Por favor, espera.</p>
+                </div>
+                <div id="modal-result" class="hidden prose max-w-none"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content max-w-sm">
+            <h2 id="confirm-modal-title" class="text-xl font-bold text-gray-800 mb-4">Confirmar Acción</h2>
+            <p id="confirm-modal-message" class="text-gray-600 mb-6"></p>
+            <div class="flex justify-end space-x-4">
+                <button id="confirm-modal-cancel" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                <button id="confirm-modal-ok" class="bg-red-600 text-white px-4 py-2 rounded-lg">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div id="onboarding-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="onboarding-step-1" class="onboarding-step active">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4">¡Bienvenido a Ficha Pet!</h2>
+                <p class="text-gray-600 mb-6">Esta es una guía rápida para mostrarte cómo funciona la app. ¡Vamos a empezar!</p>
+                <div class="text-center"><i class="fas fa-paw text-6xl text-amber-400"></i></div>
+            </div>
+            <div id="onboarding-step-2" class="onboarding-step">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4">Maneja Múltiples Mascotas</h2>
+                <p class="text-gray-600 mb-4">Desde la pantalla principal, puedes ver a todas tus mascotas. Usa el botón "Agregar Mascota" para crear una nueva ficha.</p>
+                <p class="text-gray-600 mb-6">Cada mascota tendrá su propia ficha individual.</p>
+                <div class="text-center"><i class="fas fa-users text-6xl text-blue-500"></i></div>
+            </div>
+            <div id="onboarding-step-3" class="onboarding-step">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4">Funciones con IA ✨</h2>
+                <p class="text-gray-600 mb-2">Hemos integrado la IA de Gemini para ayudarte:</p>
+                <ul class="list-disc list-inside text-gray-600 space-y-2 mb-6">
+                    <li><strong>Analizar Historial:</strong> Obtén un resumen de las notas médicas.</li>
+                    <li><strong>Analizar Exámenes:</strong> Sube una foto de un examen y la IA te lo explicará.</li>
+                    <li><strong>Guía de Cuidado:</strong> Recibe consejos personalizados para tu mascota.</li>
+                    <li><strong>Analizar Síntomas y Alimentos:</strong> Consulta rápidamente sobre síntomas o si un alimento es seguro.</li>
+                </ul>
+                <div class="text-center"><i class="fas fa-magic-sparkles text-6xl text-purple-500"></i></div>
+            </div>
+            <div id="onboarding-step-4" class="onboarding-step">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4">¡Todo Listo!</h2>
+                <p class="text-gray-600 mb-6">Toda tu información se guarda de forma segura en tu navegador. ¡Ya puedes empezar a crear las fichas de tus mascotas!</p>
+                <div class="text-center"><i class="fas fa-check-circle text-6xl text-green-500"></i></div>
+            </div>
+            <div class="flex justify-between items-center mt-8">
+                <button id="onboarding-prev" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">Anterior</button>
+                <div id="onboarding-dots" class="flex space-x-2"></div>
+                <button id="onboarding-next" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">Siguiente</button>
+                <button id="onboarding-finish" class="hidden bg-green-600 text-white px-4 py-2 rounded-lg">Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // ===================================================================================
+        // ARQUITECTURA: SELECTORES DE ELEMENTOS
+        // ===================================================================================
+        const elements = {
+            dashboardScreen: document.getElementById('dashboard-screen'),
+            petList: document.getElementById('pet-list'),
+            addPetBtn: document.getElementById('add-pet-btn'),
+            noPetsMessage: document.getElementById('no-pets-message'),
+            editScreen: document.getElementById('edit-screen'),
+            viewScreen: document.getElementById('view-screen'),
+            saveBtn: document.getElementById('saveBtn'),
+            editBtn: document.getElementById('editBtn'),
+            backToDashboardFromEdit: document.getElementById('back-to-dashboard-from-edit'),
+            backToDashboardFromView: document.getElementById('back-to-dashboard-from-view'),
+            petImage: document.getElementById('petImage'),
+            imageUpload: document.getElementById('imageUpload'),
+            petName: document.getElementById('petName'),
+            dogBtn: document.getElementById('dogBtn'),
+            catBtn: document.getElementById('catBtn'),
+            maleBtn: document.getElementById('maleBtn'),
+            femaleBtn: document.getElementById('femaleBtn'),
+            birthday: document.getElementById('birthday'),
+            weight: document.getElementById('weight'),
+            breed: document.getElementById('breed'),
+            microchipYesBtn: document.getElementById('microchipYesBtn'),
+            microchipNoBtn: document.getElementById('microchipNoBtn'),
+            lastVaccineDate: document.getElementById('lastVaccineDate'),
+            nextVaccineDate: document.getElementById('nextVaccineDate'),
+            vaccineType: document.getElementById('vaccineType'),
+            vaccineCardUpload: document.getElementById('vaccineCardUpload'),
+            vaccineCardContent: document.getElementById('vaccineCardContent'),
+            lastDewormingDate: document.getElementById('lastDewormingDate'),
+            nextDewormingDate: document.getElementById('nextDewormingDate'),
+            dewormingProduct: document.getElementById('dewormingProduct'),
+            medicalHistoryInput: document.getElementById('medicalHistoryInput'),
+            addHistoryBtn: document.getElementById('addHistoryBtn'),
+            historyEntries: document.getElementById('historyEntries'),
+            examsCardUpload: document.getElementById('examsCardUpload'),
+            examsCardPreview: document.getElementById('examsCardPreview'),
+            view: {
+                petName: document.getElementById('view-petName'),
+                breed: document.getElementById('view-breed'),
+                petImage: document.getElementById('view-petImage'),
+                type: document.getElementById('view-type'),
+                gender: document.getElementById('view-gender'),
+                birthday: document.getElementById('view-birthday'),
+                weight: document.getElementById('view-weight'),
+                microchip: document.getElementById('view-microchip'),
+                lastVaccineDate: document.getElementById('view-lastVaccineDate'),
+                nextVaccineDate: document.getElementById('view-nextVaccineDate'),
+                vaccineType: document.getElementById('view-vaccineType'),
+                vaccineCard: document.getElementById('view-vaccineCard'),
+                lastDewormingDate: document.getElementById('view-lastDewormingDate'),
+                nextDewormingDate: document.getElementById('view-nextDewormingDate'),
+                dewormingProduct: document.getElementById('view-dewormingProduct'),
+                medicalHistorySection: document.getElementById('view-medicalHistorySection'),
+                historyEntries: document.getElementById('view-historyEntries'),
+                examsSection: document.getElementById('view-examsSection'),
+                examsPreview: document.getElementById('view-examsPreview'),
+            },
+            geminiModal: document.getElementById('gemini-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            modalCloseBtn: document.getElementById('modal-close-btn'),
+            modalInputArea: document.getElementById('modal-input-area'),
+            modalInputLabel: document.getElementById('modal-input-label'),
+            modalTextInput: document.getElementById('modal-text-input'),
+            modalTextareaInput: document.getElementById('modal-textarea-input'),
+            modalSubmitBtn: document.getElementById('modal-submit-btn'),
+            modalLoader: document.getElementById('modal-loader'),
+            modalResult: document.getElementById('modal-result'),
+            analyzeHistoryBtnView: document.getElementById('analyzeHistoryBtnView'),
+            generateCareGuideBtn: document.getElementById('generateCareGuideBtn'),
+            symptomCheckerBtn: document.getElementById('symptomCheckerBtn'),
+            foodCheckerBtn: document.getElementById('foodCheckerBtn'),
+            onboardingModal: document.getElementById('onboarding-modal'),
+            onboardingPrev: document.getElementById('onboarding-prev'),
+            onboardingNext: document.getElementById('onboarding-next'),
+            onboardingFinish: document.getElementById('onboarding-finish'),
+            onboardingDots: document.getElementById('onboarding-dots'),
+            confirmModal: document.getElementById('confirm-modal'),
+            confirmModalMessage: document.getElementById('confirm-modal-message'),
+            confirmModalOk: document.getElementById('confirm-modal-ok'),
+            confirmModalCancel: document.getElementById('confirm-modal-cancel'),
+            notificationToast: document.getElementById('notification-toast'),
+        };
+
+        // ===================================================================================
+        // ARQUITECTURA: GESTIÓN DEL ESTADO
+        // ===================================================================================
+        let allPets = [];
+        let currentPetIndex = -1;
+
+        const defaultPetData = {
+            id: null, name: '', type: '', gender: '', birthday: '', weight: '', breed: '', microchip: '',
+            lastVaccineDate: '', nextVaccineDate: '', vaccineType: '', 
+            lastDewormingDate: '', nextDewormingDate: '', dewormingProduct: '', 
+            medicalHistory: [],
+            files: {
+                petImage: 'https://placehold.co/200x200/FBBF24/FFFFFF?text=Mascota',
+                vaccineCard: null,
+                exams: []
+            }
+        };
+
+        // ===================================================================================
+        // ARQUITECTURA: INTEGRACIÓN CON IA (API DE GEMINI)
+        // ===================================================================================
+        async function callGeminiAPI(prompt, base64ImageData = null) {
+            const apiKey = ""; // Manejado por el entorno de ejecución
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            let parts = [{ text: prompt }];
+            if (base64ImageData) {
+                parts.push({
+                    inlineData: {
+                        mimeType: "image/png",
+                        data: base64ImageData.split(',')[1] // Se elimina el prefijo 'data:image/png;base64,'
+                    }
+                });
+            }
+
+            const payload = { contents: [{ role: "user", parts: parts }] };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`API call failed: ${response.status}`);
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo obtener una respuesta de la IA.";
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                return `Error al contactar la IA: ${error.message}.`;
+            }
+        }
+
+        // ===================================================================================
+        // ARQUITECTURA: PERSISTENCIA DE DATOS (GUARDADO Y CARGA)
+        // ===================================================================================
+        const saveData = () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) {
+                console.error("Índice de mascota actual inválido al guardar.");
+                return;
+            }
+            const petData = allPets[currentPetIndex];
+            Object.assign(petData, {
+                name: elements.petName.value, birthday: elements.birthday.value,
+                weight: elements.weight.value, breed: elements.breed.value,
+                lastVaccineDate: elements.lastVaccineDate.value, nextVaccineDate: elements.nextVaccineDate.value,
+                vaccineType: elements.vaccineType.value, lastDewormingDate: elements.lastDewormingDate.value,
+                nextDewormingDate: elements.nextDewormingDate.value, dewormingProduct: elements.dewormingProduct.value,
+            });
+            localStorage.setItem('allPetsData', JSON.stringify(allPets));
+        };
+
+        const loadData = () => {
+            try {
+                const savedPets = localStorage.getItem('allPetsData');
+                allPets = savedPets ? JSON.parse(savedPets) : [];
+            } catch (error) {
+                console.error("Error al cargar datos de localStorage:", error);
+                allPets = []; // Si hay un error, se empieza con un array vacío
+            }
+            
+            if (!localStorage.getItem('onboardingComplete')) {
+                runOnboarding();
+            } else {
+                showDashboard();
+            }
+        };
+
+        // ===================================================================================
+        // ARQUITECTURA: GESTIÓN DE VISTAS (NAVEGACIÓN)
+        // ===================================================================================
+        const showDashboard = () => {
+            renderDashboard();
+            elements.editScreen.classList.add('hidden');
+            elements.viewScreen.classList.add('hidden');
+            elements.dashboardScreen.classList.remove('hidden');
+        };
+
+        const showEditScreen = () => { 
+            populateEditScreen(); 
+            elements.dashboardScreen.classList.add('hidden'); 
+            elements.viewScreen.classList.add('hidden'); 
+            elements.editScreen.classList.remove('hidden'); 
+        };
+
+        const showViewScreen = () => { 
+            populateViewScreen(); 
+            elements.dashboardScreen.classList.add('hidden'); 
+            elements.editScreen.classList.add('hidden'); 
+            elements.viewScreen.classList.remove('hidden'); 
+        };
+
+        // ===================================================================================
+        // ARQUITECTURA: LÓGICA DE NEGOCIO (MASCOTAS)
+        // ===================================================================================
+        const addNewPet = () => {
+            const newPet = JSON.parse(JSON.stringify(defaultPetData));
+            newPet.id = Date.now();
+            allPets.push(newPet);
+            currentPetIndex = allPets.length - 1;
+            showEditScreen();
+        };
+
+        const deletePet = (index) => {
+            allPets.splice(index, 1);
+            localStorage.setItem('allPetsData', JSON.stringify(allPets));
+            showDashboard();
+        };
+
+        const viewPet = (index) => {
+            currentPetIndex = index;
+            showViewScreen();
+        };
+        
+        // ===================================================================================
+        // ARQUITECTURA: RENDERIZADO DE LA UI
+        // ===================================================================================
+        const renderDashboard = () => {
+            elements.petList.innerHTML = '';
+            if (allPets.length > 0) {
+                allPets.forEach((pet, index) => {
+                    const petCard = document.createElement('div');
+                    petCard.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center cursor-pointer hover:shadow-xl transition relative';
+                    petCard.innerHTML = `
+                        <button class="delete-pet-btn absolute top-2 right-2 text-red-400 hover:text-red-600" data-index="${index}" aria-label="Eliminar ficha de ${pet.name || 'esta mascota'}"><i class="fas fa-trash-alt"></i></button>
+                        <img src="${pet.files.petImage}" class="w-28 h-28 rounded-full object-cover border-4 border-amber-300 mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">${pet.name || 'Sin Nombre'}</h3>
+                    `;
+                    petCard.querySelector('.delete-pet-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showConfirmModal(
+                            `¿Estás seguro de que quieres eliminar a ${pet.name || 'esta mascota'}?`,
+                            () => {
+                                deletePet(index);
+                            }
+                        );
+                    });
+                    petCard.addEventListener('click', () => viewPet(index));
+                    elements.petList.appendChild(petCard);
+                });
+                elements.noPetsMessage.classList.add('hidden');
+            } else {
+                elements.noPetsMessage.classList.remove('hidden');
+            }
+        };
+
+        const populateEditScreen = () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            
+            elements.petName.value = petData.name || '';
+            elements.birthday.value = petData.birthday || '';
+            elements.weight.value = petData.weight || '';
+            elements.breed.value = petData.breed || '';
+            elements.lastVaccineDate.value = petData.lastVaccineDate || '';
+            elements.nextVaccineDate.value = petData.nextVaccineDate || '';
+            elements.vaccineType.value = petData.vaccineType || '';
+            elements.lastDewormingDate.value = petData.lastDewormingDate || '';
+            elements.nextDewormingDate.value = petData.nextDewormingDate || '';
+            elements.dewormingProduct.value = petData.dewormingProduct || '';
+            elements.petImage.src = petData.files.petImage;
+            
+            updateButtonUI('type', petData.type);
+            updateButtonUI('gender', petData.gender);
+            updateButtonUI('microchip', petData.microchip);
+            
+            renderImagePreview(petData.files.vaccineCard, elements.vaccineCardContent, 'Subir carnet');
+            renderExamsPreview();
+            renderMedicalHistory();
+        };
+        
+        const populateViewScreen = () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+
+            elements.view.petName.textContent = petData.name || 'Sin Nombre';
+            elements.view.breed.textContent = petData.breed || 'Raza no especificada';
+            elements.view.petImage.src = petData.files.petImage;
+            elements.view.type.textContent = petData.type === 'dog' ? 'Perro' : petData.type === 'cat' ? 'Gato' : 'N/A';
+            elements.view.gender.textContent = petData.gender === 'male' ? 'Macho' : petData.gender === 'female' ? 'Hembra' : 'N/A';
+            elements.view.birthday.textContent = petData.birthday || 'N/A';
+            elements.view.weight.textContent = petData.weight ? `${petData.weight} kg` : 'N/A';
+            elements.view.microchip.textContent = petData.microchip === 'yes' ? 'Sí' : petData.microchip === 'no' ? 'No' : 'N/A';
+            elements.view.lastVaccineDate.textContent = petData.lastVaccineDate || 'N/A';
+            elements.view.nextVaccineDate.textContent = petData.nextVaccineDate || 'N/A';
+            elements.view.vaccineType.textContent = petData.vaccineType || 'N/A';
+            elements.view.lastDewormingDate.textContent = petData.lastDewormingDate || 'N/A';
+            elements.view.nextDewormingDate.textContent = petData.nextDewormingDate || 'N/A';
+            elements.view.dewormingProduct.textContent = petData.dewormingProduct || 'N/A';
+            elements.view.vaccineCard.innerHTML = petData.files.vaccineCard ? `<h4 class="font-bold mt-4">Carnet:</h4><img src="${petData.files.vaccineCard}" class="mt-2 rounded-lg border max-w-full">` : '';
+            elements.view.medicalHistorySection.classList.toggle('hidden', petData.medicalHistory.length === 0);
+            if (petData.medicalHistory.length > 0) {
+                elements.view.historyEntries.innerHTML = petData.medicalHistory.map(e => `<div class="view-history-entry"><p class="font-bold">${e.date}</p><p class="whitespace-pre-wrap">${e.text}</p></div>`).join('');
+            }
+            elements.view.examsSection.classList.toggle('hidden', petData.files.exams.length === 0);
+            if(petData.files.exams.length > 0) {
+                elements.view.examsPreview.innerHTML = petData.files.exams.map(exam => {
+                    const isPdf = exam.type && exam.type.includes('pdf');
+                    let analyzeButton = '';
+                    if (!isPdf) {
+                        analyzeButton = `<button class="analyze-exam-btn-view gemini-btn text-white px-2 py-1 rounded text-xs mt-1" data-name="${exam.name}"><i class="fas fa-magic-sparkles"></i> Analizar</button>`;
+                    }
+                    return `<div class="text-center">
+                         ${!isPdf ? `<img src="${exam.data}" class="border rounded-lg w-full h-auto object-cover">` : '<div class="border rounded-lg p-4 bg-gray-100 flex items-center justify-center h-full"><i class="fas fa-file-pdf text-4xl text-red-500"></i></div>'}
+                         <p class="font-bold text-xs mt-1 truncate">${exam.name}</p>
+                         ${analyzeButton}
+                    </div>`
+                }).join('');
+            }
+        };
+
+        const updateButtonUI = (group, value) => {
+            const inactive = 'bg-gray-200 text-gray-800';
+            const buttons = group === 'type' ? { a: elements.dogBtn, b: elements.catBtn, valA: 'dog', activeA: 'bg-blue-500 text-white', activeB: 'bg-purple-500 text-white' } 
+                          : group === 'gender' ? { a: elements.maleBtn, b: elements.femaleBtn, valA: 'male', activeA: 'bg-blue-500 text-white', activeB: 'bg-pink-500 text-white' }
+                          : { a: elements.microchipYesBtn, b: elements.microchipNoBtn, valA: 'yes', activeA: 'bg-green-500 text-white', activeB: 'bg-red-500 text-white' };
+            
+            if (value === buttons.valA) {
+                buttons.a.className = buttons.a.className.replace(inactive, buttons.activeA).replace(buttons.activeB, inactive);
+                buttons.b.className = buttons.b.className.replace(buttons.activeA, inactive).replace(buttons.activeB, inactive);
+            } else if (value) {
+                buttons.b.className = buttons.b.className.replace(inactive, buttons.activeB).replace(buttons.activeA, inactive);
+                buttons.a.className = buttons.a.className.replace(buttons.activeB, inactive).replace(buttons.activeA, inactive);
+            }
+        };
+
+        const handleFileUpload = (file, dataKey, targetElement, placeholderText) => {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+                const petData = allPets[currentPetIndex];
+                const keys = dataKey.split('.');
+                petData[keys[0]][keys[1]] = e.target.result;
+                renderImagePreview(e.target.result, targetElement, placeholderText);
+            };
+            reader.onerror = () => {
+                console.error("Error al leer el archivo.");
+                showNotification("No se pudo cargar el archivo. Inténtalo de nuevo.", "error");
+            };
+            reader.readAsDataURL(file);
+        };
+        
+        const renderImagePreview = (result, targetElement, placeholderText) => {
+            targetElement.innerHTML = result ? `<img src="${result}" class="rounded-lg max-h-40 object-contain">` : `<i class="fas fa-file-image text-4xl text-gray-400 mb-2"></i><p class="text-gray-500">${placeholderText}</p>`;
+        };
+
+        const renderExamsPreview = () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            elements.examsCardPreview.innerHTML = '';
+            if (petData.files.exams.length > 0) {
+                petData.files.exams.forEach(exam => {
+                    const isPdf = exam.type && exam.type.includes('pdf');
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'flex items-center justify-between bg-gray-100 p-2 rounded-lg';
+                    let buttons = `<button class="remove-exam-btn text-red-500 hover:text-red-700 ml-2" data-name="${exam.name}"><i class="fas fa-times"></i></button>`;
+                    if (!isPdf) {
+                         buttons = `<button class="analyze-exam-btn-edit gemini-btn text-white px-2 py-1 rounded text-xs ml-2" data-name="${exam.name}"><i class="fas fa-magic-sparkles"></i></button>` + buttons;
+                    }
+                    previewItem.innerHTML = `<div class="flex items-center overflow-hidden"><i class="fas ${isPdf ? 'fa-file-pdf text-red-500' : 'fa-file-image text-blue-500'} text-xl mr-2 flex-shrink-0"></i><span class="truncate text-sm">${exam.name}</span></div><div class="flex items-center">${buttons}</div>`;
+                    elements.examsCardPreview.appendChild(previewItem);
+                });
+            }
+        };
+        
+        const renderMedicalHistory = () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            elements.historyEntries.innerHTML = petData.medicalHistory.map((entry, index) => `<div class="medical-history-item bg-gray-50 p-3 rounded-r-lg"><div class="flex justify-between items-start"><div class="flex-1"><h3 class="font-medium text-gray-800 text-sm">${entry.date}</h3><p class="text-gray-600 whitespace-pre-wrap">${entry.text}</p></div><button class="delete-entry-btn text-red-500 hover:text-red-700 ml-2" data-index="${index}"><i class="fas fa-times"></i></button></div></div>`).join('');
+        };
+
+        // ===================================================================================
+        // ARQUITECTURA: LÓGICA DE MODALES Y NOTIFICACIONES
+        // ===================================================================================
+        const showNotification = (message, type = 'info') => {
+            const toast = elements.notificationToast;
+            toast.textContent = message;
+            toast.className = `toast-${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        const showModal = (title, mode = 'display') => {
+            elements.modalTitle.textContent = title;
+            elements.modalInputArea.classList.toggle('hidden', mode === 'display');
+            elements.modalResult.classList.toggle('hidden', mode !== 'display');
+            elements.modalLoader.classList.add('hidden');
+            
+            if (mode === 'symptom') {
+                elements.modalInputLabel.textContent = "Describe los síntomas de tu mascota:";
+                elements.modalTextareaInput.classList.remove('hidden');
+                elements.modalTextInput.classList.add('hidden');
+            } else if (mode === 'food') {
+                elements.modalInputLabel.textContent = "Ingresa un alimento o ingrediente:";
+                elements.modalTextareaInput.classList.add('hidden');
+                elements.modalTextInput.classList.remove('hidden');
+            }
+
+            elements.geminiModal.classList.add('active');
+        };
+        const hideModal = () => elements.geminiModal.classList.remove('active');
+        const showModalResult = (htmlContent) => { 
+            elements.modalInputArea.classList.add('hidden');
+            elements.modalResult.innerHTML = htmlContent; 
+            elements.modalLoader.classList.add('hidden'); 
+            elements.modalResult.classList.remove('hidden'); 
+        };
+
+        const showConfirmModal = (message, onConfirm) => {
+            elements.confirmModalMessage.textContent = message;
+            elements.confirmModal.classList.add('active');
+
+            const newOk = elements.confirmModalOk.cloneNode(true);
+            elements.confirmModalOk.parentNode.replaceChild(newOk, elements.confirmModalOk);
+            elements.confirmModalOk = newOk;
+            
+            elements.confirmModalOk.addEventListener('click', () => {
+                onConfirm();
+                elements.confirmModal.classList.remove('active');
+            });
+
+            elements.confirmModalCancel.addEventListener('click', () => {
+                elements.confirmModal.classList.remove('active');
+            }, { once: true });
+        };
+
+        const runOnboarding = () => {
+            let currentStep = 1;
+            const totalSteps = 4;
+            const updateOnboardingUI = () => {
+                for (let i = 1; i <= totalSteps; i++) {
+                    document.getElementById(`onboarding-step-${i}`).classList.toggle('active', i === currentStep);
+                }
+                elements.onboardingDots.innerHTML = Array.from({length: totalSteps}, (_, i) => `<div class="w-2 h-2 rounded-full ${i + 1 === currentStep ? 'bg-indigo-600' : 'bg-gray-300'}"></div>`).join('');
+                elements.onboardingPrev.classList.toggle('hidden', currentStep === 1);
+                elements.onboardingNext.classList.toggle('hidden', currentStep === totalSteps);
+                elements.onboardingFinish.classList.toggle('hidden', currentStep !== totalSteps);
+            };
+            elements.onboardingModal.classList.add('active');
+            updateOnboardingUI();
+            elements.onboardingNext.onclick = () => { if (currentStep < totalSteps) { currentStep++; updateOnboardingUI(); } };
+            elements.onboardingPrev.onclick = () => { if (currentStep > 1) { currentStep--; updateOnboardingUI(); } };
+            elements.onboardingFinish.onclick = () => {
+                elements.onboardingModal.classList.remove('active');
+                localStorage.setItem('onboardingComplete', 'true');
+                showDashboard();
+            };
+        };
+        
+        // ===================================================================================
+        // ARQUITECTURA: MANEJADORES DE EVENTOS (EVENT LISTENERS)
+        // ===================================================================================
+        elements.addPetBtn.addEventListener('click', addNewPet);
+        elements.saveBtn.addEventListener('click', () => {
+            if (!elements.petName.value.trim()) {
+                showNotification("El nombre de la mascota no puede estar vacío.", "error");
+                return;
+            }
+            saveData(); 
+            showViewScreen(); 
+        });
+        elements.editBtn.addEventListener('click', () => showEditScreen());
+        elements.backToDashboardFromEdit.addEventListener('click', showDashboard);
+        elements.backToDashboardFromView.addEventListener('click', showDashboard);
+        
+        elements.dogBtn.addEventListener('click', () => { if (currentPetIndex > -1) allPets[currentPetIndex].type = 'dog'; updateButtonUI('type', 'dog'); });
+        elements.catBtn.addEventListener('click', () => { if (currentPetIndex > -1) allPets[currentPetIndex].type = 'cat'; updateButtonUI('type', 'cat'); });
+        elements.maleBtn.addEventListener('click', () => { if (currentPetIndex > -1) allPets[currentPetIndex].gender = 'male'; updateButtonUI('gender', 'male'); });
+        elements.femaleBtn.addEventListener('click', () => { if (currentPetIndex > -1) allPets[currentPetIndex].gender = 'female'; updateButtonUI('gender', 'female'); });
+        elements.microchipYesBtn.addEventListener('click', () => { if (currentPetIndex > -1) allPets[currentPetIndex].microchip = 'yes'; updateButtonUI('microchip', 'yes'); });
+        elements.microchipNoBtn.addEventListener('click', () => { if (currentPetIndex > -1) allPets[currentPetIndex].microchip = 'no'; updateButtonUI('microchip', 'no'); });
+
+        elements.imageUpload.addEventListener('change', (e) => {
+            if (!e.target.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = (event) => { 
+                if (currentPetIndex > -1) {
+                    allPets[currentPetIndex].files.petImage = event.target.result; 
+                    elements.petImage.src = event.target.result; 
+                }
+            };
+            reader.onerror = () => { showNotification("Error al leer el archivo de imagen.", "error"); };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+        
+        elements.vaccineCardUpload.addEventListener('change', (e) => handleFileUpload(e.target.files[0], 'files.vaccineCard', elements.vaccineCardContent, 'Subir carnet'));
+
+        elements.lastVaccineDate.addEventListener('change', (e) => {
+            if (isNaN(new Date(e.target.value).getTime())) {
+                showNotification("Fecha de vacunación inválida.", "error");
+                return;
+            }
+            if (e.target.value) {
+                const date = new Date(e.target.value);
+                date.setFullYear(date.getFullYear() + 1);
+                elements.nextVaccineDate.value = date.toISOString().split('T')[0];
+            }
+        });
+        elements.lastDewormingDate.addEventListener('change', (e) => {
+            if (isNaN(new Date(e.target.value).getTime())) {
+                showNotification("Fecha de desparasitación inválida.", "error");
+                return;
+            }
+            if (e.target.value) {
+                const date = new Date(e.target.value);
+                date.setMonth(date.getMonth() + 6);
+                elements.nextDewormingDate.value = date.toISOString().split('T')[0];
+            }
+        });
+
+        elements.addHistoryBtn.addEventListener('click', () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const text = elements.medicalHistoryInput.value.trim();
+            if (text) {
+                allPets[currentPetIndex].medicalHistory.unshift({ date: new Date().toLocaleString('es-ES'), text });
+                elements.medicalHistoryInput.value = '';
+                renderMedicalHistory();
+            }
+        });
+
+        elements.historyEntries.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-entry-btn')) {
+                if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+                allPets[currentPetIndex].medicalHistory.splice(e.target.closest('.delete-entry-btn').dataset.index, 1);
+                renderMedicalHistory();
+            }
+        });
+
+        elements.examsCardUpload.addEventListener('change', (e) => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    allPets[currentPetIndex].files.exams.push({ name: file.name, type: file.type, data: event.target.result });
+                    renderExamsPreview();
+                };
+                reader.onerror = () => { showNotification(`Error al leer el archivo ${file.name}.`, "error"); };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        elements.examsCardPreview.addEventListener('click', async (e) => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            if (e.target.closest('.remove-exam-btn')) {
+                const nameToRemove = e.target.closest('.remove-exam-btn').dataset.name;
+                petData.files.exams = petData.files.exams.filter(exam => exam.name !== nameToRemove);
+                renderExamsPreview();
+            } else if (e.target.closest('.analyze-exam-btn-edit')) {
+                const nameToAnalyze = e.target.closest('.analyze-exam-btn-edit').dataset.name;
+                const exam = petData.files.exams.find(ex => ex.name === nameToAnalyze);
+                if (exam && exam.data && exam.type.includes('image')) {
+                    showModal(`Análisis de Examen: ${exam.name}`);
+                    const prompt = "Eres un asistente veterinario experto. Analiza la siguiente imagen de un examen médico y explica los resultados en términos sencillos que un dueño de mascota pueda entender. No ofrezcas un diagnóstico definitivo, pero resalta cualquier valor que parezca fuera de lo normal y sugiere que se discuta con un veterinario.";
+                    const result = await callGeminiAPI(prompt, exam.data);
+                    showModalResult(result.replace(/\n/g, '<br>'));
+                } else {
+                    showNotification("Solo se pueden analizar archivos de imagen.", "info");
+                }
+            }
+        });
+        
+        elements.view.examsPreview.addEventListener('click', async (e) => {
+            if (e.target.closest('.analyze-exam-btn-view')) {
+                if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+                const petData = allPets[currentPetIndex];
+                const nameToAnalyze = e.target.closest('.analyze-exam-btn-view').dataset.name;
+                const exam = petData.files.exams.find(ex => ex.name === nameToAnalyze);
+                if (exam && exam.data && exam.type.includes('image')) {
+                    showModal(`Análisis de Examen: ${exam.name}`);
+                    const prompt = "Eres un asistente veterinario experto. Analiza la siguiente imagen de un examen médico y explica los resultados en términos sencillos que un dueño de mascota pueda entender. No ofrezcas un diagnóstico definitivo, pero resalta cualquier valor que parezca fuera de lo normal y sugiere que se discuta con un veterinario.";
+                    const result = await callGeminiAPI(prompt, exam.data);
+                    showModalResult(result.replace(/\n/g, '<br>'));
+                } else {
+                    showNotification("Solo se pueden analizar archivos de imagen.", "info");
+                }
+            }
+        });
+        
+        elements.modalCloseBtn.addEventListener('click', hideModal);
+
+        elements.analyzeHistoryBtnView.addEventListener('click', async () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            if (petData.medicalHistory.length === 0) {
+                showNotification("No hay historial médico para analizar.", "info");
+                return;
+            }
+            showModal("Análisis del Historial Médico");
+            const historyText = petData.medicalHistory.map(e => `${e.date}: ${e.text}`).join('\n');
+            const prompt = `Eres un asistente veterinario experto. Resume el siguiente historial médico de una mascota en puntos clave. Destaca posibles preocupaciones o temas importantes para discutir con un veterinario. No ofrezcas un diagnóstico, solo un resumen para facilitar la conversación con un profesional. El historial es:\n\n${historyText}`;
+            const result = await callGeminiAPI(prompt);
+            showModalResult(result.replace(/\n/g, '<br>'));
+        });
+
+        elements.generateCareGuideBtn.addEventListener('click', async () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            showModal("Guía de Cuidado Personalizada");
+            const { name, type, breed, birthday, weight } = petData;
+            let age = 'no especificada';
+            if (birthday) {
+                const ageDifMs = Date.now() - new Date(birthday).getTime();
+                age = Math.abs(new Date(ageDifMs).getUTCFullYear() - 1970) + " años";
+            }
+            const prompt = `Eres un experto en cuidado de mascotas. Genera una guía de cuidados amigable y personalizada para la siguiente mascota. Incluye consejos sobre ejercicio, dieta (sin recomendar marcas específicas), y problemas de salud comunes para su raza y edad. Formatea la respuesta con encabezados y listas.\n\n- Nombre: ${name}\n- Tipo: ${type}\n- Raza: ${breed}\n- Edad: ${age}\n- Peso: ${weight} kg`;
+            const result = await callGeminiAPI(prompt);
+            showModalResult(result.replace(/\n/g, '<br>'));
+        });
+
+        elements.symptomCheckerBtn.addEventListener('click', () => {
+            showModal("Analizador de Síntomas", "symptom");
+        });
+
+        elements.foodCheckerBtn.addEventListener('click', () => {
+            showModal("Verificador de Alimentos", "food");
+        });
+
+        elements.modalSubmitBtn.addEventListener('click', async () => {
+            if (currentPetIndex < 0 || currentPetIndex >= allPets.length) return;
+            const petData = allPets[currentPetIndex];
+            const { name, type, breed, birthday, weight } = petData;
+            let age = 'no especificada';
+            if (birthday) {
+                const ageDifMs = Date.now() - new Date(birthday).getTime();
+                age = Math.abs(new Date(ageDifMs).getUTCFullYear() - 1970) + " años";
+            }
+
+            elements.modalInputArea.classList.add('hidden');
+            elements.modalLoader.classList.remove('hidden');
+
+            let prompt = '';
+            let result = '';
+
+            if (!elements.modalTextareaInput.classList.contains('hidden')) { // Symptom Checker
+                const symptoms = elements.modalTextareaInput.value;
+                if (!symptoms.trim()) {
+                    showNotification("Por favor, describe los síntomas.", "error");
+                    hideModal();
+                    return;
+                }
+                prompt = `Eres un asistente veterinario virtual. Una mascota llamada ${name}, que es un ${type} de raza ${breed} con ${age} y un peso de ${weight} kg, presenta los siguientes síntomas: "${symptoms}". Proporciona una orientación general sobre posibles causas, sin dar un diagnóstico. Clasifica la urgencia en una de estas tres categorías: 'ACCIÓN INMEDIATA: Contacta a un veterinario de urgencia', 'CONSULTA RECOMENDADA: Pide una cita con tu veterinario', o 'OBSERVACIÓN: Vigila a tu mascota en casa'. Incluye una advertencia clara de que esta es solo una guía informativa y no reemplaza la consulta con un profesional.`;
+                result = await callGeminiAPI(prompt);
+            } else { // Food Checker
+                const food = elements.modalTextInput.value;
+                if (!food.trim()) {
+                    showNotification("Por favor, ingresa un alimento.", "error");
+                    hideModal();
+                    return;
+                }
+                prompt = `¿Un ${type} puede comer ${food}? Explica brevemente si es seguro, tóxico, o si se debe dar con moderación, y por qué.`;
+                result = await callGeminiAPI(prompt);
+            }
+            
+            showModalResult(result.replace(/\n/g, '<br>'));
+            elements.modalTextareaInput.value = '';
+            elements.modalTextInput.value = '';
+        });
+        
+        // ===================================================================================
+        // ARQUITECTURA: INICIO DE LA APLICACIÓN
+        // ===================================================================================
+        loadData();
+    });
+    </script>
+</body>
+</html>

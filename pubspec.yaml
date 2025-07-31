@@ -1,0 +1,78 @@
+name: zonix
+description: "App de ZONIX"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Core de Flutter
+  cupertino_icons: ^1.0.8
+  
+  # Estado y navegación
+  provider: ^6.1.2
+  
+  # HTTP para Gemini API
+  http: ^1.2.2
+  http_parser: ^4.0.2
+  
+  # Variables de entorno
+  flutter_dotenv: ^5.2.1
+  
+  # Persistencia local
+  shared_preferences: ^2.3.2
+  
+  # Selección de archivos
+  image_picker: ^1.1.2
+  file_picker: ^8.1.2
+  
+  # Procesamiento de imágenes
+  image: ^4.3.0
+  
+  # Permisos
+  permission_handler: ^11.3.1
+  
+  # JSON
+  json_annotation: ^4.9.0
+  
+  # URLs
+  url_launcher: ^6.3.1
+  
+  # PDF
+  pdf: ^3.11.1
+  path_provider: ^2.1.5
+  
+  # Internacionalización
+  intl: ^0.19.0
+  
+  # Logger (para debug)
+  logger: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0 
+  build_runner: ^2.4.13
+  json_serializable: ^6.8.0
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon1.png"
+  image_path_android: "assets/icon/icon1.png"
+  adaptive_icon_background: "assets/icon/christmas-background.png"
+  adaptive_icon_foreground: "assets/icon/icon-foreground-432x432.png"
+  adaptive_icon_monochrome: "assets/icon/icon-monochrome-432x432.png"
+  remove_alpha_ios: true
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/1.png
+    - assets/images/2.png 
+    - .env
+    - assets/fonts/Roboto-Regular.ttf
