@@ -36,12 +36,21 @@ class _AddPetScreenState extends State<AddPetScreen> {
       final newPet = Pet(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
-        species: _speciesController.text,
+        type: _speciesController.text,
         breed: _breedController.text,
-        age: _ageController.text,
-        ownerName: _ownerNameController.text,
-        ownerPhone: _ownerPhoneController.text,
-        imageUrl: 'assets/images/1.png', // Default image
+        birthday: _ageController.text,
+        weight: '',
+        gender: '',
+        microchip: '',
+        lastVaccineDate: '',
+        nextVaccineDate: '',
+        vaccineType: '',
+        lastDewormingDate: '',
+        nextDewormingDate: '',
+        dewormingProduct: '',
+        petImage: 'assets/images/1.png', // Default image
+        medicalHistory: [],
+        examFiles: [],
       );
 
       petProvider.addPet(newPet);

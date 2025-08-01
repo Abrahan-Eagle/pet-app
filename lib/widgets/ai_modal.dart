@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/ai_service.dart';
+
 import 'dart:typed_data';
 
 class AIModal extends StatefulWidget {

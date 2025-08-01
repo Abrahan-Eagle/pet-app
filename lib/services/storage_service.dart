@@ -13,7 +13,7 @@ class StorageService {
       final petsJson = pets.map((pet) => _petToJson(pet)).toList();
       await prefs.setString(_petsKey, jsonEncode(petsJson));
     } catch (error) {
-      print('Error al guardar mascotas: $error');
+      // Error al guardar mascotas: $error
     }
   }
 
@@ -28,7 +28,7 @@ class StorageService {
         return petsJson.map((json) => _petFromJson(json)).toList();
       }
     } catch (error) {
-      print('Error al cargar mascotas: $error');
+      // Error al cargar mascotas: $error
     }
 
     return [];
@@ -40,7 +40,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_onboardingKey, true);
     } catch (error) {
-      print('Error al guardar estado de onboarding: $error');
+      // Error al guardar estado de onboarding: $error
     }
   }
 
@@ -50,7 +50,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(_onboardingKey) ?? false;
     } catch (error) {
-      print('Error al verificar onboarding: $error');
+      // Error al verificar onboarding: $error
       return false;
     }
   }

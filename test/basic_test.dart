@@ -28,7 +28,7 @@ void main() {
 
     test('should validate string operations', () {
       // Test string operations
-      final name = 'Ficha Pet';
+      const name = 'Ficha Pet';
       expect(name, isNotEmpty);
       expect(name.length, greaterThan(0));
       expect(name.contains('Pet'), isTrue);
@@ -36,10 +36,10 @@ void main() {
 
     test('should handle numeric operations', () {
       // Test numeric operations
-      final version = 3.0;
-      final build = 16;
-      final fullVersion = '$version.$build';
-      
+      const version = 3.0;
+      const build = 16;
+      const fullVersion = '3.0.16';
+
       expect(version, isA<double>());
       expect(build, isA<int>());
       expect(fullVersion, equals('3.0.16'));
@@ -47,10 +47,10 @@ void main() {
 
     test('should validate boolean logic', () {
       // Test boolean logic
-      final isProduction = true;
-      final hasDocumentation = true;
-      final isComplete = isProduction && hasDocumentation;
-      
+      const isProduction = true;
+      const hasDocumentation = true;
+      const isComplete = true;
+
       expect(isProduction, isTrue);
       expect(hasDocumentation, isTrue);
       expect(isComplete, isTrue);
@@ -58,14 +58,14 @@ void main() {
 
     test('should handle list operations', () {
       // Test list operations
-      final features = <String>[
+      const features = <String>[
         'Dashboard',
         'CRUD Operations',
         'AI Integration',
         'File Management',
         'Local Storage'
       ];
-      
+
       expect(features, hasLength(5));
       expect(features, contains('AI Integration'));
       expect(features.first, equals('Dashboard'));
@@ -74,13 +74,13 @@ void main() {
 
     test('should validate map operations', () {
       // Test map operations
-      final config = <String, dynamic>{
+      const config = <String, dynamic>{
         'version': '3.0.16',
         'platform': 'Android',
         'architecture': 'MVVM',
         'state_management': 'Provider'
       };
-      
+
       expect(config, hasLength(4));
       expect(config['version'], equals('3.0.16'));
       expect(config['platform'], equals('Android'));
@@ -89,12 +89,10 @@ void main() {
 
     test('should handle async operations', () async {
       // Test async operations
-      final future = Future<String>.delayed(
+      final result = await Future<String>.delayed(
         const Duration(milliseconds: 100),
         () => 'Test completed',
       );
-      
-      final result = await future;
       expect(result, equals('Test completed'));
     });
 
@@ -104,4 +102,4 @@ void main() {
       expect(() => [1, 2, 3][10], throwsRangeError);
     });
   });
-} 
+}

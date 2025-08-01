@@ -4,10 +4,10 @@ void main() {
   group('Integration Tests', () {
     test('should validate project configuration', () {
       // Test project configuration
-      final projectName = 'Ficha Pet';
-      final version = '3.0.16';
-      final platform = 'Android';
-      
+      const projectName = 'Ficha Pet';
+      const version = '3.0.16';
+      const platform = 'Android';
+
       expect(projectName, equals('Ficha Pet'));
       expect(version, equals('3.0.16'));
       expect(platform, equals('Android'));
@@ -15,14 +15,14 @@ void main() {
 
     test('should validate AI features configuration', () {
       // Test AI features configuration
-      final aiFeatures = [
+      const aiFeatures = [
         'Análisis de Historial Médico',
         'Generador de Guías de Cuidado',
         'Analizador de Síntomas',
         'Verificador de Alimentos',
         'Análisis de Exámenes Médicos'
       ];
-      
+
       expect(aiFeatures, hasLength(5));
       expect(aiFeatures, contains('Análisis de Historial Médico'));
       expect(aiFeatures, contains('Generador de Guías de Cuidado'));
@@ -33,9 +33,9 @@ void main() {
 
     test('should validate file handling capabilities', () {
       // Test file handling capabilities
-      final supportedFormats = ['jpg', 'jpeg', 'png', 'pdf'];
-      final maxFileSize = 10 * 1024 * 1024; // 10MB
-      
+      const supportedFormats = ['jpg', 'jpeg', 'png', 'pdf'];
+      const maxFileSize = 10485760; // 10MB
+
       expect(supportedFormats, hasLength(4));
       expect(supportedFormats, contains('jpg'));
       expect(supportedFormats, contains('png'));
@@ -45,10 +45,10 @@ void main() {
 
     test('should validate data persistence configuration', () {
       // Test data persistence configuration
-      final storageType = 'SharedPreferences';
-      final autoSave = true;
-      final backupEnabled = false;
-      
+      const storageType = 'SharedPreferences';
+      const autoSave = true;
+      const backupEnabled = false;
+
       expect(storageType, equals('SharedPreferences'));
       expect(autoSave, isTrue);
       expect(backupEnabled, isFalse);
@@ -56,11 +56,11 @@ void main() {
 
     test('should validate UI/UX configuration', () {
       // Test UI/UX configuration
-      final designSystem = 'Material Design 3';
-      final primaryColor = '#4F46E5';
-      final fontFamily = 'Roboto';
-      final responsive = true;
-      
+      const designSystem = 'Material Design 3';
+      const primaryColor = '#4F46E5';
+      const fontFamily = 'Roboto';
+      const responsive = true;
+
       expect(designSystem, equals('Material Design 3'));
       expect(primaryColor, equals('#4F46E5'));
       expect(fontFamily, equals('Roboto'));
@@ -69,10 +69,10 @@ void main() {
 
     test('should validate performance metrics', () {
       // Test performance metrics
-      final apkSize = 121; // MB
-      final buildTime = 21; // seconds
-      final dependencies = 15;
-      
+      const apkSize = 121; // MB
+      const buildTime = 21; // seconds
+      const dependencies = 15;
+
       expect(apkSize, lessThan(150));
       expect(buildTime, lessThan(30));
       expect(dependencies, lessThan(20));
@@ -80,10 +80,10 @@ void main() {
 
     test('should validate security configuration', () {
       // Test security configuration
-      final apiKeyProtected = true;
-      final inputValidation = true;
-      final localStorage = true;
-      
+      const apiKeyProtected = true;
+      const inputValidation = true;
+      const localStorage = true;
+
       expect(apiKeyProtected, isTrue);
       expect(inputValidation, isTrue);
       expect(localStorage, isTrue);
@@ -91,7 +91,7 @@ void main() {
 
     test('should validate documentation completeness', () {
       // Test documentation completeness
-      final documentationFiles = [
+      const documentationFiles = [
         'README.md',
         'DOCUMENTATION.md',
         'USER_GUIDE.md',
@@ -99,7 +99,7 @@ void main() {
         'PROJECT_CONFIG.md',
         'DOCUMENTATION_SUMMARY.md'
       ];
-      
+
       expect(documentationFiles, hasLength(6));
       expect(documentationFiles, contains('README.md'));
       expect(documentationFiles, contains('DOCUMENTATION.md'));
@@ -111,10 +111,10 @@ void main() {
 
     test('should validate testing configuration', () {
       // Test testing configuration
-      final testFramework = 'Flutter Test';
-      final testCoverage = 85; // percentage
-      final testTypes = ['unit', 'widget', 'integration'];
-      
+      const testFramework = 'Flutter Test';
+      const testCoverage = 85; // percentage
+      const testTypes = ['unit', 'widget', 'integration'];
+
       expect(testFramework, equals('Flutter Test'));
       expect(testCoverage, greaterThan(80));
       expect(testTypes, hasLength(3));
@@ -125,15 +125,15 @@ void main() {
 
     test('should validate deployment readiness', () {
       // Test deployment readiness
-      final apkGenerated = true;
-      final documentationComplete = true;
-      final testsPassing = true;
-      final optimizationApplied = true;
-      
+      const apkGenerated = true;
+      const documentationComplete = true;
+      const testsPassing = true;
+      const optimizationApplied = true;
+
       expect(apkGenerated, isTrue);
       expect(documentationComplete, isTrue);
       expect(testsPassing, isTrue);
       expect(optimizationApplied, isTrue);
     });
   });
-} 
+}
