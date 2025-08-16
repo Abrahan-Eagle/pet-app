@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/pet_provider.dart';
+
+import 'package:zonix/providers/pet_provider.dart';
 
 class AddPetScreen extends StatefulWidget {
   const AddPetScreen({super.key});

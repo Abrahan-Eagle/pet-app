@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../services/storage_service.dart';
+
+import 'package:zonix/services/storage_service.dart';
 
 class Pet {
   final String id;

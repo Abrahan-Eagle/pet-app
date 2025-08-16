@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/storage_service.dart';
+
+import 'package:zonix/services/storage_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

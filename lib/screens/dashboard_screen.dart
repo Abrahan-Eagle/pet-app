@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert';
-import '../providers/pet_provider.dart';
 
-import 'edit_pet_screen.dart';
-import 'view_pet_screen.dart';
+import 'package:zonix/providers/pet_provider.dart';
+import 'package:zonix/services/ad_service.dart';
+import 'package:zonix/widgets/ad_banner.dart';
+import 'package:zonix/widgets/rewarded_button.dart';
+import 'package:zonix/screens/edit_pet_screen.dart';
+import 'package:zonix/screens/view_pet_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -31,22 +35,28 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.pets,
-                            size: 32,
-                            color: Colors.indigo[700],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.pets,
+                                size: 32,
+                                color: Colors.indigo[700],
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Ficha Pet',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.indigo[700],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Ficha Pet',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.indigo[700],
-                            ),
-                          ),
+                          const RewardedButton(),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -134,6 +144,12 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: const SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 8, top: 4),
+          child: Center(child: AdBanner()),
         ),
       ),
       floatingActionButton: Consumer<PetProvider>(
@@ -299,6 +315,8 @@ class DashboardScreen extends StatelessWidget {
   }
 
   void _viewPet(BuildContext context, Pet pet) {
+    // Show interstitial ad occasionally before navigating
+    AdService.showInterstitialIfAvailable();
     Navigator.push(
       context,
       MaterialPageRoute(

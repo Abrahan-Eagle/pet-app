@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import '../providers/pet_provider.dart';
+
+import 'package:zonix/providers/pet_provider.dart';
 
 class StorageService {
   static const String _petsKey = 'allPetsData';

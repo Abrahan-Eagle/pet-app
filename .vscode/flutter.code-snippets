@@ -1,0 +1,52 @@
+{
+  "Flutter Stateless Widget": {
+    "prefix": "fstateless",
+    "body": [
+      "class ${1:WidgetName} extends StatelessWidget {",
+      "  const ${1:WidgetName}({super.key});",
+      "",
+      "  @override",
+      "Widget build(BuildContext context) {",
+      "    return ${2:Container}(",
+      "      child: ${3:Text}('${4:Hello World}'),",
+      "    );",
+      "  }",
+      "}"
+    ],
+    "description": "Create a new StatelessWidget"
+  },
+  "Flutter Stateful Widget": {
+    "prefix": "fstateful",
+    "body": [
+      "class ${1:WidgetName} extends StatefulWidget {",
+      "  const ${1:WidgetName}({super.key});",
+      "",
+      "  @override",
+      "  State<${1:WidgetName}> createState() => _${1:WidgetName}State();",
+      "}",
+      "",
+      "class _${1:WidgetName}State extends State<${1:WidgetName}> {",
+      "  @override",
+      "  Widget build(BuildContext context) {",
+      "    return ${2:Container}(",
+      "      child: ${3:Text}('${4:Hello World}'),",
+      "    );",
+      "  }",
+      "}"
+    ],
+    "description": "Create a new StatefulWidget"
+  },
+  "Provider Consumer": {
+    "prefix": "fprovider",
+    "body": [
+      "Consumer<${1:ProviderType}>(",
+      "  builder: (context, ${2:provider}, child) {",
+      "    return ${3:Container}(",
+      "      child: ${4:Text}('${5:Hello World}'),",
+      "    );",
+      "  },",
+      ")"
+    ],
+    "description": "Create a Provider Consumer widget"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "name": "Pet App",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "dart.flutterSdkPath": "auto",
+    "dart.sdkPath": "auto",
+    "files.exclude": {
+      "**/.dart_tool": true,
+      "**/build": true,
+      "**/.flutter-plugins": true,
+      "**/.flutter-plugins-dependencies": true,
+      "**/.packages": true,
+      "**/pubspec.lock": true
+    },
+    "search.exclude": {
+      "**/build": true,
+      "**/.dart_tool": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "Dart-Code.dart-code",
+      "Dart-Code.flutter"
+    ]
+  }
+}

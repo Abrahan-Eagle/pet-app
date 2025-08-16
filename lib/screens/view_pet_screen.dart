@@ -1,11 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/pet_provider.dart';
-import '../services/ai_service.dart';
-import '../widgets/ai_modal.dart';
-import 'edit_pet_screen.dart';
 
-import 'dart:convert';
+import 'package:zonix/providers/pet_provider.dart';
+import 'package:zonix/services/ai_service.dart';
+import 'package:zonix/widgets/ai_modal.dart';
+import 'package:zonix/screens/edit_pet_screen.dart';
 
 class ViewPetScreen extends StatelessWidget {
   final Pet pet;

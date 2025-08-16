@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    // 🚀 FLUTTER & DART (ESENCIALES)
+    "Dart-Code.dart-code",
+    "Dart-Code.flutter",
+    // 🔧 DESARROLLO GENERAL (LIGERAS)
+    "ms-vscode.vscode-json",
+    "esbenp.prettier-vscode",
+    // 🐙 GIT (ESENCIAL)
+    "eamodio.gitlens",
+    // 📱 MOBILE DEVELOPMENT (OPCIONAL)
+    "ms-vscode.vscode-typescript-next"
+  ]
+}

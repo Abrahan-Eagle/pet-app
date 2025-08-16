@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
-
 import 'dart:convert';
 import 'dart:io';
-import '../providers/pet_provider.dart';
-import '../services/ai_service.dart';
-import '../widgets/ai_modal.dart';
-import 'view_pet_screen.dart';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:zonix/providers/pet_provider.dart';
+import 'package:zonix/screens/view_pet_screen.dart';
+import 'package:zonix/services/ai_service.dart';
+import 'package:zonix/widgets/ai_modal.dart';
 
 class EditPetScreen extends StatefulWidget {
   final Pet pet;
@@ -178,14 +178,15 @@ class _EditPetScreenState extends State<EditPetScreen> {
   }
 
   Future<void> _pickExamFiles() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
       allowMultiple: true,
     );
 
     if (result != null) {
-      for (var file in result.files) {
+      final files = List<PlatformFile>.from(result.files);
+      for (final file in files) {
         if (file.path != null) {
           final bytes = await File(file.path!).readAsBytes();
           final examFile = ExamFile(
@@ -208,7 +209,14 @@ class _EditPetScreenState extends State<EditPetScreen> {
   }
 
   bool _isImageFile(String fileType) {
-    final imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+    final imageExtensions = <String>[
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'bmp',
+      'webp'
+    ];
     return imageExtensions.contains(fileType.toLowerCase());
   }
 

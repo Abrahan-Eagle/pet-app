@@ -1,0 +1,97 @@
+{
+  // General Settings
+  "cursor.general.enableTelemetry": false,
+  "cursor.general.enableCrashReports": false,
+  "cursor.general.enableUsageData": false,
+  // AI Chat Configuration
+  "cursor.chat.defaultModel": "claude-3.5-sonnet",
+  "cursor.chat.enableAutoComplete": true,
+  "cursor.chat.enableInlineChat": true,
+  "cursor.chat.enableContextAwareness": true,
+  "cursor.chat.enableProjectSpecificContext": true,
+  // Editor Configuration
+  "cursor.editor.enableInlineCompletions": true,
+  "cursor.editor.enableGhostText": true,
+  "cursor.editor.enableParameterHints": true,
+  "cursor.editor.enableSmartIndentation": true,
+  "cursor.editor.enableBracketPairColorization": true,
+  // Code Completions
+  "cursor.completions.enableAutoImport": true,
+  "cursor.completions.enableAutoComplete": true,
+  "cursor.completions.enableSnippets": true,
+  "cursor.completions.enableContextAwareCompletions": true,
+  "cursor.completions.enableFlutterSpecificCompletions": true,
+  // Terminal Configuration
+  "cursor.terminal.enableSmartTerminal": true,
+  "cursor.terminal.enableAutoComplete": true,
+  "cursor.terminal.enableFlutterCommands": true,
+  // Git Configuration
+  "cursor.git.enableSmartCommits": true,
+  "cursor.git.enableAutoStaging": false,
+  "cursor.git.enableConventionalCommits": true,
+  // Testing Configuration
+  "cursor.testing.enableAutoTestGeneration": true,
+  "cursor.testing.enableTestRunner": true,
+  "cursor.testing.enableFlutterTestIntegration": true,
+  // Debugging Configuration
+  "cursor.debugging.enableSmartDebugging": true,
+  "cursor.debugging.enableAutoBreakpoints": false,
+  "cursor.debugging.enableFlutterDebugging": true,
+  // Performance Configuration
+  "cursor.performance.enableLazyLoading": true,
+  "cursor.performance.enableBackgroundProcessing": true,
+  "cursor.performance.enableSmartFileIndexing": true,
+  "cursor.performance.enableFlutterOptimizations": true,
+  // Flutter Specific
+  "cursor.flutter.enableHotReload": true,
+  "cursor.flutter.enableWidgetInspector": true,
+  "cursor.flutter.enablePerformanceOverlay": true,
+  "cursor.flutter.enableDebugBanner": true,
+  // Code Quality
+  "cursor.quality.enableAutoLinting": true,
+  "cursor.quality.enableAutoFormatting": true,
+  "cursor.quality.enableImportOptimization": true,
+  // Project Management
+  "cursor.project.enableSmartFileOrganization": true,
+  "cursor.project.enableFlutterStructureDetection": true,
+  "cursor.project.enableDependencyManagement": true,
+  // User Rules Configuration
+  "cursor.userRules.enableCustomRules": true,
+  "cursor.userRules.enableGlobalRules": true,
+  "cursor.userRules.enableProjectRules": true,
+  "cursor.userRules.enableLanguageSpecificRules": true,
+  "cursor.userRules.enableFlutterRules": true,
+  "cursor.userRules.enableLaravelRules": true,
+  "cursor.userRules.enablePythonRules": true,
+  "cursor.userRules.enableGitRules": true,
+  // Workspace Rules
+  "cursor.workspace.enableProjectSpecificContext": true,
+  "cursor.workspace.enableMultiLanguageSupport": true,
+  "cursor.workspace.enableFrameworkDetection": true,
+  "cursor.workspace.enableArchitectureGuidance": true,
+  "cursor.workspace.enableBestPractices": true,
+  // Project Settings
+  "cursor.project.enableAutoConfiguration": true,
+  "cursor.project.enableFrameworkDetection": true,
+  "cursor.project.enableDependencyAnalysis": true,
+  "cursor.project.enableCodeStructureAnalysis": true,
+  "cursor.project.enablePerformanceMonitoring": true,
+  // Language Support
+  "cursor.languages.enableDart": true,
+  "cursor.languages.enableFlutter": true,
+  "cursor.languages.enablePHP": true,
+  "cursor.languages.enableLaravel": true,
+  "cursor.languages.enablePython": true,
+  "cursor.languages.enableGit": true,
+  "cursor.languages.enableMarkdown": true,
+  "cursor.languages.enableJSON": true,
+  // AI Assistant Configuration
+  "cursor.ai.enableSmartSuggestions": true,
+  "cursor.ai.enableCodeGeneration": true,
+  "cursor.ai.enableRefactoring": true,
+  "cursor.ai.enableDocumentation": true,
+  "cursor.ai.enableTesting": true,
+  "cursor.ai.enableDebugging": true,
+  "cursor.ai.enablePerformanceOptimization": true,
+  "cursor.ai.enableSecurityAnalysis": true
+}

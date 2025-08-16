@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 class AIService {
   static const String _baseUrl =
@@ -17,7 +18,7 @@ class AIService {
 
       final url = Uri.parse('$_baseUrl?key=$apiKey');
 
-      List<Map<String, dynamic>> parts = [
+      final List<Map<String, dynamic>> parts = [
         {'text': prompt}
       ];
 
@@ -64,8 +65,8 @@ class AIService {
     final historyText =
         history.map((e) => '${e['date']}: ${e['text']}').join('\n');
     final prompt = '''
-Eres un asistente veterinario experto. Resume el siguiente historial médico de una mascota en puntos clave. 
-Destaca posibles preocupaciones o temas importantes para discutir con un veterinario. 
+Eres un asistente veterinario experto. Resume el siguiente historial médico de una mascota en puntos clave.
+Destaca posibles preocupaciones o temas importantes para discutir con un veterinario.
 No ofrezcas un diagnóstico, solo un resumen para facilitar la conversación con un profesional.
 
 El historial es:
@@ -85,8 +86,8 @@ $historyText
     required String weight,
   }) async {
     final prompt = '''
-Eres un experto en cuidado de mascotas. Genera una guía de cuidados amigable y personalizada para la siguiente mascota. 
-Incluye consejos sobre ejercicio, dieta (sin recomendar marcas específicas), y problemas de salud comunes para su raza y edad. 
+Eres un experto en cuidado de mascotas. Genera una guía de cuidados amigable y personalizada para la siguiente mascota.
+Incluye consejos sobre ejercicio, dieta (sin recomendar marcas específicas), y problemas de salud comunes para su raza y edad.
 Formatea la respuesta con encabezados y listas.
 
 - Nombre: $name
@@ -109,10 +110,10 @@ Formatea la respuesta con encabezados y listas.
     required String weight,
   }) async {
     final prompt = '''
-Eres un asistente veterinario virtual. Una mascota llamada $name, que es un $type de raza $breed con $age y un peso de $weight kg, 
-presenta los siguientes síntomas: "$symptoms". 
+Eres un asistente veterinario virtual. Una mascota llamada $name, que es un $type de raza $breed con $age y un peso de $weight kg,
+presenta los siguientes síntomas: "$symptoms".
 
-Proporciona una orientación general sobre posibles causas, sin dar un diagnóstico. 
+Proporciona una orientación general sobre posibles causas, sin dar un diagnóstico.
 Clasifica la urgencia en una de estas tres categorías:
 - ACCIÓN INMEDIATA: Contacta a un veterinario de urgencia
 - CONSULTA RECOMENDADA: Pide una cita con tu veterinario
@@ -142,9 +143,9 @@ Incluye una advertencia clara de que esta es solo una guía informativa y no ree
     required Uint8List imageData,
   }) async {
     final prompt = '''
-Eres un asistente veterinario experto. Analiza la siguiente imagen de un examen médico llamado "$examName" 
-y explica los resultados en términos sencillos que un dueño de mascota pueda entender. 
-No ofrezcas un diagnóstico definitivo, pero resalta cualquier valor que parezca fuera de lo normal 
+Eres un asistente veterinario experto. Analiza la siguiente imagen de un examen médico llamado "$examName"
+y explica los resultados en términos sencillos que un dueño de mascota pueda entender.
+No ofrezcas un diagnóstico definitivo, pero resalta cualquier valor que parezca fuera de lo normal
 y sugiere que se discuta con un veterinario.
 ''';
 

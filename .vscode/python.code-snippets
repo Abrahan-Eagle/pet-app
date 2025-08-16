@@ -1,0 +1,92 @@
+{
+  "Python Class": {
+    "prefix": "pclass",
+    "body": [
+      "class ${1:ClassName}:",
+      "    \"\"\"${2:Class description}\"\"\"",
+      "    ",
+      "    def __init__(self, ${3:param1}: ${4:str}):",
+      "        \"\"\"Initialize ${1:ClassName}.\"\"\"",
+      "        self.${3:param1} = ${3:param1}",
+      "    ",
+      "    def ${5:method_name}(self) -> ${6:str}:",
+      "        \"\"\"${7:Method description}\"\"\"",
+      "        ${8:return self.${3:param1}}",
+      ""
+    ],
+    "description": "Create a new Python class"
+  },
+  
+  "Python Function": {
+    "prefix": "pfunc",
+    "body": [
+      "def ${1:function_name}(${2:param1}: ${3:str}) -> ${4:str}:",
+      "    \"\"\"${5:Function description}\"\"\"",
+      "    ${6:# Logic here}",
+      "    return ${7:result}",
+      ""
+    ],
+    "description": "Create a new Python function"
+  },
+  
+  "Python Async Function": {
+    "prefix": "pasync",
+    "body": [
+      "async def ${1:function_name}(${2:param1}: ${3:str}) -> ${4:str}:",
+      "    \"\"\"${5:Async function description}\"\"\"",
+      "    ${6:# Async logic here}",
+      "    return ${7:result}",
+      ""
+    ],
+    "description": "Create a new async Python function"
+  },
+  
+  "Python Dataclass": {
+    "prefix": "pdataclass",
+    "body": [
+      "from dataclasses import dataclass",
+      "from typing import Optional",
+      "",
+      "@dataclass",
+      "class ${1:ClassName}:",
+      "    \"\"\"${2:Dataclass description}\"\"\"",
+      "    ${3:field1}: ${4:str}",
+      "    ${5:field2}: Optional[${6:int}] = None",
+      ""
+    ],
+    "description": "Create a new Python dataclass"
+  },
+  
+  "Python Test": {
+    "prefix": "ptest",
+    "body": [
+      "import pytest",
+      "from ${1:module_name} import ${2:ClassName}",
+      "",
+      "def test_${3:test_name}():",
+      "    \"\"\"Test ${4:test description}\"\"\"",
+      "    ${5:# Arrange}",
+      "    ${6:obj} = ${2:ClassName}(${7:'test'})",
+      "    ",
+      "    ${8:# Act}",
+      "    ${9:result} = ${6:obj}.${10:method_name}()",
+      "    ",
+      "    ${11:# Assert}",
+      "    assert ${9:result} == ${12:expected_value}",
+      ""
+    ],
+    "description": "Create a new Python test"
+  },
+  
+  "Python Main": {
+    "prefix": "pmain",
+    "body": [
+      "if __name__ == \"__main__\":",
+      "    ${1:# Main execution logic}",
+      "    print(\"${2:Hello, World!}\")",
+      ""
+    ],
+    "description": "Create Python main block"
+  }
+}
+

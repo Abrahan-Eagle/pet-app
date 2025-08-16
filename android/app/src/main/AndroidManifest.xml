@@ -52,24 +52,15 @@
             </intent-filter>
         </activity>
 
+        <!-- AdMob App ID (real ID for production) -->
         <meta-data
-            android:name="com.google.android.gms.auth.api.credentials.ClientId"
-            android:value="608143949661-g749kjpeasc4ktj8frofrc9k6kge5g78.apps.googleusercontent.com"/>
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
-        <meta-data
-            android:name="com.google.android.gms.auth.api.credentials.API_KEY"
-            android:value="AIzaSyCyVrcmdTiihm5kv0wuAG0xQvPtqL6Ih6s"/>
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" /> <!-- ID de test -->
 
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
 
-            <meta-data
-        android:name="com.google.mlkit.vision.DEPENDENCIES"
-        android:value="face" />
-        
     </application>
 
     <queries>

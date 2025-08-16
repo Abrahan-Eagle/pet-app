@@ -1,3 +1,103 @@
 {
-    "cmake.sourceDirectory": "/var/www/ZONIX/zonix/linux"
+  // Flutter & Dart Configuration
+  "dart.flutterSdkPath": "auto",
+  "dart.sdkPath": "auto",
+  "dart.lineLength": 80,
+  "dart.enableSdkFormatter": true,
+  "dart.formatOnSave": true,
+  "dart.formatOnType": true,
+  "dart.showTodos": true,
+  "dart.analyzerPath": "auto",
+  "dart.analyzerAdditionalArgs": ["--no-fatal-warnings"],
+  
+  // PHP & Laravel Configuration
+  "php.validate.enable": true,
+  "php.suggest.basic": false,
+  "php.executablePath": "/usr/bin/php",
+  "php.validate.executablePath": "/usr/bin/php",
+  "phpcs.standard": "PSR12",
+  "phpcs.executablePath": "/usr/local/bin/phpcs",
+  "phpcs.ignorePatterns": [
+    "*/vendor/*",
+    "*/node_modules/*"
+  ],
+  
+  // Python Configuration
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length", "88"],
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--max-line-length=88"],
+  "python.sortImports.args": ["--profile", "black"],
+  
+  // Editor General Configuration
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.rulers": [80, 88, 120],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  
+  // File Management
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.associations": {
+    "*.blade.php": "blade",
+    "*.php": "php",
+    "*.py": "python",
+    "*.dart": "dart"
+  },
+  
+  // Search Exclusions
+  "search.exclude": {
+    "**/build": true,
+    "**/.dart_tool": true,
+    "**/.flutter-plugins": true,
+    "**/.flutter-plugins-dependencies": true,
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/storage": true,
+    "**/bootstrap/cache": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  },
+  
+  // Emmet Support
+  "emmet.includeLanguages": {
+    "dart": "html",
+    "blade": "html",
+    "php": "html"
+  },
+  
+  // Terminal Configuration
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  
+  // Git Configuration
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  
+  // GitHub Configuration
+  "github.pullRequests.enabled": true,
+  "github.issues.enabled": true,
+  
+  // Database Configuration
+  "sqltools.connections": [
+    {
+      "name": "Local MySQL",
+      "driver": "MySQL",
+      "server": "localhost",
+      "port": 3306,
+      "database": "pet_app",
+      "username": "root",
+      "password": ""
+    }
+  ]
 }
