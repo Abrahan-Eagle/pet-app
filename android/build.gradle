@@ -1,13 +1,13 @@
 //nuevo
 buildscript {
-    ext.kotlin_version = '2.0.20' // Actualizado a la versión compatible
+    ext.kotlin_version = '2.1.0' // Actualizado a la versión compatible
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.4.0' // Updated to support SDK 35
+        classpath 'com.android.tools.build:gradle:8.6.0' // Updated to support SDK 36
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.2'
     }

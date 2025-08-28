@@ -12,10 +12,10 @@ android {
     //   namespace = "com.example.zonix_app"
     //compileSdk = flutter.compileSdkVersion
    // ndkVersion = flutter.ndkVersion
-    
+
     //namespace "com.zonix.zionix"
-    compileSdk =  35
-    buildToolsVersion "35.0.0"
+    compileSdk =  36
+    buildToolsVersion "36.0.0"
 
     compileOptions {
         //sourceCompatibility = JavaVersion.VERSION_1_8
@@ -39,18 +39,18 @@ android {
         //targetSdk = flutter.targetSdkVersion
         //versionCode = flutter.versionCode
         //versionName = flutter.versionName
-        
-        
+
+
          //applicationId "com.zonix.zionix"
-        minSdk 23
-        targetSdk 35
+        minSdkVersion flutter.minSdkVersion
+        targetSdk 36
         versionCode 36
         versionName "3.0.16"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildFeatures.buildConfig = true
-        
+
     }
-    
+
     signingConfigs {
         debug {
             keyAlias 'androiddebugkey'
@@ -90,7 +90,7 @@ android {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.0.20' // Verifica la versión
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.0' // Verifica la versión
     implementation 'com.google.android.gms:play-services-auth:21.2.0'
 
     // Aquí puedes agregar otras dependencias necesarias para tu proyecto
